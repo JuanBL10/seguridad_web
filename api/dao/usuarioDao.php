@@ -56,5 +56,36 @@ class UsuarioDAO{
             ":correo" => $correo
         ]);
     }
+
+    //Restablecer contra
+    public function buscarPorTokenRecuperacion($token)
+    {
+        $sql = "SELECT id, correo
+                FROM usuarios
+                WHERE token_recuperacion = :token";
+
+        $consulta = $this->conexion->prepare($sql);
+
+        $consulta->execute([
+            ":token" => $token
+        ]);
+
+        return $consulta->fetch();
+    }
+
+    public function restablecerPassword($token, $passwordEncriptada)
+    {
+        $sql = "UPDATE usuarios
+                SET password = :password,
+                    token_recuperacion = NULL
+                WHERE token_recuperacion = :token";
+
+        $consulta = $this->conexion->prepare($sql);
+
+        return $consulta->execute([
+            ":password" => $passwordEncriptada,
+            ":token" => $token
+        ]);
+    }
 }
 ?>

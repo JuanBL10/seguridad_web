@@ -182,5 +182,54 @@ class UsuarioController
             ]
         ];
     }
+
+    public function restablecerPassword($datos)
+    {
+        $token = trim($datos["token"] ?? "");
+        $password = $datos["password"] ?? "";
+
+        if ($token === "" || $password === "") {
+            return [
+                "codigo" => 400,
+                "respuesta" => [
+                    "mensaje" => "El token y la nueva contraseña son obligatorios."
+                ]
+            ];
+        }
+
+        $usuario = $this->usuarioDAO->buscarPorTokenRecuperacion($token);
+
+        if ($usuario === false) {
+            return [
+                "codigo" => 401,
+                "respuesta" => [
+                    "mensaje" => "El token de recuperación no es válido o ya fue utilizado."
+                ]
+            ];
+        }
+
+        $passwordEncriptada = password_hash($password, PASSWORD_DEFAULT);
+
+        $passwordActualizada = $this->usuarioDAO->restablecerPassword(
+            $token,
+            $passwordEncriptada
+        );
+
+        if (!$passwordActualizada) {
+            return [
+                "codigo" => 500,
+                "respuesta" => [
+                    "mensaje" => "No fue posible restablecer la contraseña."
+                ]
+            ];
+        }
+
+        return [
+            "codigo" => 200,
+            "respuesta" => [
+                "mensaje" => "Contraseña restablecida exitosamente."
+            ]
+        ];
+    }
 }
 ?>
