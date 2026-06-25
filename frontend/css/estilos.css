@@ -1,3 +1,10 @@
 body {
     background-color: #f4f6f9;
 }
+
+#mensajeLogin:empty,
+#mensajeRegistro:empty,
+#mensajeRecuperar:empty,
+#mensajeReset:empty {
+    display: none;
+}
