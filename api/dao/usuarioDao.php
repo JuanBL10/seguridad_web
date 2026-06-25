@@ -1,0 +1,33 @@
+<?php
+require_once __DIR__ . "/../config/conexion.php";
+require_once __DIR__ . "/../models/usuario.php";
+
+class UsuarioDAO{
+    private $conexion;
+    public function __construct(){
+        $conexionBaseDatos = new Conexion();
+        $this->conexion = $conexionBaseDatos->Conectar();
+    }
+    //Para ingresar un nuevo usuario
+    public function validarSiCorreoExiste($correo){
+        $sql = "Select id from usuarios 
+                where correo = :correo";
+        $consulta = $this->conexion->prepare($sql);
+        $consulta->execute([":correo" => $correo]);
+        return $consulta->fetch() !== false;
+    }
+    public function registrar(Usuario $usuario)
+    {
+        $sql = "INSERT INTO usuarios (nombre, correo, password)
+                VALUES (:nombre, :correo, :password)";
+
+        $consulta = $this->conexion->prepare($sql);
+
+        return $consulta->execute([
+            ":nombre" => $usuario->getNombre(),
+            ":correo" => $usuario->getCorreo(),
+            ":password" => $usuario->getPassword()
+        ]);
+    }
+}
+?>
