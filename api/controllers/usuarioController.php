@@ -71,5 +71,61 @@ class UsuarioController
             ]
         ];
     }
+
+    public function iniciarSesion($datos)
+    {
+        $correo = trim($datos["correo"] ?? "");
+        $password = $datos["password"] ?? "";
+
+        if($correo === "" || $password === ""){
+            return [
+                "codigo" => 400,
+                "respuesta" => [
+                    "mensaje" => "Correo y contraseña son campos obligatorios."
+                ]
+            ];
+        }
+
+        if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            return [
+                "codigo" => 400,
+                "respuesta" => [
+                    "mensaje" => "El correo no tiene un formato válido."
+                ]
+            ];
+        }
+        
+        $usuario = $this->usuarioDAO->obtenerDatosUsuario($correo);
+
+        if ($usuario === false) {
+            return [
+                "codigo" => 401,
+                "respuesta" => [
+                    "mensaje" => "Usuario no encontrado o inactivo."
+                ]
+            ];
+        }
+
+        if (!password_verify($password, $usuario["password"])) {
+            return [
+                "codigo" => 401,
+                "respuesta" => [
+                    "mensaje" => "Contraseña incorrecta."
+                ]
+            ];
+        }
+
+        return [
+            "codigo" => 200,
+            "respuesta" => [
+                "mensaje" => "Inicio de sesión exitoso.",
+                "usuario" => [
+                    "nombre" => $usuario["nombre"],
+                    "correo" => $usuario["correo"]
+                ]
+            ]
+        ];
+    }
+
 }
 ?>

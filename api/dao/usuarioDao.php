@@ -29,5 +29,32 @@ class UsuarioDAO{
             ":password" => $usuario->getPassword()
         ]);
     }
+
+    //Para validar si un usuario existe y que inicie sesion
+    public function obtenerDatosUsuario($correo){
+        $sql = "Select nombre, correo, password
+                from usuarios where correo = :correo
+                and estado = 'Activo'";
+        $consulta = $this->conexion->prepare($sql);
+        $consulta->execute([
+            ":correo" => $correo
+        ]);
+        return $consulta->fetch();
+    }
+
+    //Solicitar recuperacion
+    public function guardarTokenRecuperacion($correo, $token)
+    {
+        $sql = "UPDATE usuarios
+                SET token_recuperacion = :token
+                WHERE correo = :correo";
+
+        $consulta = $this->conexion->prepare($sql);
+
+        return $consulta->execute([
+            ":token" => $token,
+            ":correo" => $correo
+        ]);
+    }
 }
 ?>
